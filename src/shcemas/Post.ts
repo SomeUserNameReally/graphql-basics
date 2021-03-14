@@ -16,5 +16,5 @@ export default class Post {
     published!: boolean;
 
     @Field(() => User!)
-    author!: boolean;
+    author!: string;
 }

@@ -1,4 +1,4 @@
-import { Arg, Query, Resolver } from "type-graphql";
+import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import Post from "../shcemas/Post";
 import UsersResolvers, { UserData } from "./UserResolver";
 
@@ -7,10 +7,10 @@ interface PostData {
     title: string;
     body: string;
     published: boolean;
-    author: UserData;
+    author: string;
 }
 
-@Resolver(() => Post)
+@Resolver((_of) => Post)
 export default class PostResolvers {
     static readonly posts: ReadonlyArray<PostData> = Object.freeze([
         {
@@ -18,47 +18,53 @@ export default class PostResolvers {
             title: "Post 1",
             body: "Post 1 body",
             published: true,
-            author:
-                UsersResolvers.users.find((user) => user.id === "456") ||
-                UsersResolvers.defaultUser
+            author: "456"
+            //     UsersResolvers.users.find((user) => user.id === "456") ||
+            //     UsersResolvers.defaultUser
         },
         {
             id: "456",
             title: "Post 2",
             body: "Post 2 body",
             published: false,
-            author:
-                UsersResolvers.users.find((user) => user.id === "456") ||
-                UsersResolvers.defaultUser
+            author: "456"
+            //     UsersResolvers.users.find((user) => user.id === "456") ||
+            //     UsersResolvers.defaultUser
         }
     ]);
 
-    @Query(() => Post)
+    @Query((_returns) => Post)
     getBasePost(): PostData {
         return {
             id: "1239d980fdn34kjldsf9034kl",
             title: "This is my first post!",
             body: "This is the body for my first post!",
             published: true,
-            author:
-                UsersResolvers.users.find((user) => user.id === "123") ||
-                UsersResolvers.defaultUser
+            author: "123"
         };
     }
 
-    @Query(() => [Post!]!)
+    @Query((_returns) => [Post!]!)
     posts(
-        @Arg("query", { nullable: true }) query?: string
+        @Arg("query", { nullable: true })
+        query?: string
     ): ReadonlyArray<PostData> {
-        if (query && query.length > 0) {
+        if (query && query.trim().length > 0) {
             // Prone to overflow attacks
+            const re = new RegExp(query.trim().toLowerCase(), "g");
             return PostResolvers.posts.filter((post) =>
-                post.title
-                    .toLowerCase()
-                    .match(new RegExp(query.toLowerCase(), "g"))
+                re.exec(post.title.toLowerCase())
             );
         }
 
         return PostResolvers.posts;
+    }
+
+    @FieldResolver()
+    author(@Root() post: Post): UserData {
+        const foundUser = UsersResolvers.users.find(
+            (user) => user.id === post.author
+        );
+        return foundUser || UsersResolvers.defaultUser;
     }
 }

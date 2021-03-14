@@ -8,13 +8,12 @@
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:type-graphql/recommended"
-
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": 12,
         "sourceType": "module",
-        "project": "./*"
+        "project": "./src/*"
     },
     "plugins": [
         "@typescript-eslint",
