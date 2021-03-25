@@ -2,7 +2,7 @@ import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import Post from "../shcemas/Post";
 import UsersResolvers, { UserData } from "./UserResolver";
 
-interface PostData {
+export interface PostData {
     id: string;
     title: string;
     body: string;
@@ -30,18 +30,19 @@ export default class PostResolvers {
             author: "456"
             //     UsersResolvers.users.find((user) => user.id === "456") ||
             //     UsersResolvers.defaultUser
-        }
-    ]);
-
-    @Query((_returns) => Post)
-    getBasePost(): PostData {
-        return {
+        },
+        {
             id: "1239d980fdn34kjldsf9034kl",
             title: "This is my first post!",
             body: "This is the body for my first post!",
             published: true,
             author: "123"
-        };
+        }
+    ]);
+
+    @Query((_returns) => Post!)
+    getBasePost(): PostData {
+        return PostResolvers.posts[2]!;
     }
 
     @Query((_returns) => [Post!]!)

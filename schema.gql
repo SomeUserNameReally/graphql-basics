@@ -15,7 +15,7 @@ type Query {
   getBasePost: Post!
   me: User!
   posts(query: String): [Post!]!
-  user(id: String!): User!
+  user(id: String!): User
   users(query: String): [User!]!
 }
 
@@ -24,4 +24,5 @@ type User {
   email: String!
   id: String!
   name: String!
+  posts: [Post!]!
 }

@@ -1,5 +1,7 @@
-import { Arg, Query, Resolver } from "type-graphql";
+import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import User from "../shcemas/User";
+import PostResolvers, { PostData } from "./PostResolver";
+import Post from "../shcemas/Post";
 
 export interface UserData {
     id: string;
@@ -33,29 +35,17 @@ export default class UsersResolvers {
         }
     ]);
 
-    @Query(() => User)
+    @Query((_returns) => User!)
     me(): UserData {
-        return {
-            id: "abc123",
-            name: "Ajay",
-            email: "abc@email.com"
-        };
+        return UsersResolvers.users[1]!;
     }
 
-    @Query(() => User)
+    @Query((_returns) => User, { nullable: true })
     user(@Arg("id") id: string): UserData | undefined {
-        if (id === "123") {
-            return {
-                id: "123",
-                name: "Ajay Singh",
-                email: "123@email.com"
-            };
-        }
-
-        return;
+        return UsersResolvers.users.find((user) => user.id === id);
     }
 
-    @Query(() => [User!]!)
+    @Query((_returns) => [User!]!)
     users(
         @Arg("query", { nullable: true }) query?: string
     ): ReadonlyArray<UserData> {
@@ -69,5 +59,10 @@ export default class UsersResolvers {
         }
 
         return UsersResolvers.users;
+    }
+
+    @FieldResolver((_returns) => [Post!]!)
+    posts(@Root() user: User): ReadonlyArray<PostData> {
+        return PostResolvers.posts.filter((post) => post.author === user.id);
     }
 }
