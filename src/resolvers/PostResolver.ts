@@ -1,6 +1,6 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import Post from "../shcemas/Post";
-import UsersResolvers, { UserData } from "./UserResolver";
+import { UsersResolvers, UserData } from "./UserResolver";
 
 export interface PostData {
     id: string;
@@ -11,7 +11,7 @@ export interface PostData {
 }
 
 @Resolver((_of) => Post)
-export default class PostResolvers {
+export class PostResolvers {
     static readonly posts: ReadonlyArray<PostData> = Object.freeze([
         {
             id: "123",

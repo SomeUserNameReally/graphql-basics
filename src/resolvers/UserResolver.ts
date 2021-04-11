@@ -1,6 +1,6 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import User from "../shcemas/User";
-import PostResolvers, { PostData } from "./PostResolver";
+import { PostResolvers, PostData } from "./PostResolver";
 import Post from "../shcemas/Post";
 
 export interface UserData {
@@ -11,7 +11,7 @@ export interface UserData {
 }
 
 @Resolver(() => User)
-export default class UsersResolvers {
+export class UsersResolvers {
     static readonly defaultUser: Readonly<UserData> = Object.freeze({
         email: "default@default.com",
         name: "default",
