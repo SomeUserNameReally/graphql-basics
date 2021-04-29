@@ -1,5 +1,6 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
-import Post from "../shcemas/Post";
+import Post from "../schema/Post";
+import User from "../schema/User";
 import { UsersResolvers, UserData } from "./UserResolver";
 
 export interface PostData {
@@ -19,8 +20,6 @@ export class PostResolvers {
             body: "Post 1 body",
             published: true,
             author: "456"
-            //     UsersResolvers.users.find((user) => user.id === "456") ||
-            //     UsersResolvers.defaultUser
         },
         {
             id: "456",
@@ -28,8 +27,6 @@ export class PostResolvers {
             body: "Post 2 body",
             published: false,
             author: "456"
-            //     UsersResolvers.users.find((user) => user.id === "456") ||
-            //     UsersResolvers.defaultUser
         },
         {
             id: "1239d980fdn34kjldsf9034kl",
@@ -45,13 +42,22 @@ export class PostResolvers {
         return PostResolvers.posts[2]!;
     }
 
-    @Query((_returns) => [Post!]!)
+    @Query((_returns) => Post, { nullable: true })
+    getPost(
+        @Arg("id")
+        id: string
+    ): PostData | undefined {
+        return PostResolvers.posts.find((post) => post.id === id);
+    }
+
+    @Query((_returns) => [Post]!, { nullable: true })
     posts(
         @Arg("query", { nullable: true })
         query?: string
     ): ReadonlyArray<PostData> {
         if (query && query.trim().length > 0) {
             // Prone to overflow attacks
+            // Sanitize input!
             const re = new RegExp(query.trim().toLowerCase(), "g");
             return PostResolvers.posts.filter((post) =>
                 re.exec(post.title.toLowerCase())
@@ -61,11 +67,8 @@ export class PostResolvers {
         return PostResolvers.posts;
     }
 
-    @FieldResolver()
-    author(@Root() post: Post): UserData {
-        const foundUser = UsersResolvers.users.find(
-            (user) => user.id === post.author
-        );
-        return foundUser || UsersResolvers.defaultUser;
+    @FieldResolver((_returns) => User, { nullable: true })
+    author(@Root() post: Post): UserData | undefined {
+        return UsersResolvers.users.find((user) => user.id === post.author);
     }
 }

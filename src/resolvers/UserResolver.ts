@@ -1,7 +1,9 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
-import User from "../shcemas/User";
+import User from "../schema/User";
 import { PostResolvers, PostData } from "./PostResolver";
-import Post from "../shcemas/Post";
+import Post from "../schema/Post";
+import { CommentData, CommentResolvers } from "./CommentResolver";
+import Comment from "../schema/Comment";
 
 export interface UserData {
     id: string;
@@ -12,13 +14,6 @@ export interface UserData {
 
 @Resolver(() => User)
 export class UsersResolvers {
-    static readonly defaultUser: Readonly<UserData> = Object.freeze({
-        email: "default@default.com",
-        name: "default",
-        age: -1,
-        id: "no-user"
-    });
-
     static readonly users: ReadonlyArray<UserData> = Object.freeze([
         {
             id: "123",
@@ -45,12 +40,13 @@ export class UsersResolvers {
         return UsersResolvers.users.find((user) => user.id === id);
     }
 
-    @Query((_returns) => [User!]!)
+    @Query((_returns) => [User]!, { nullable: true })
     users(
         @Arg("query", { nullable: true }) query?: string
     ): ReadonlyArray<UserData> {
         if (query && query.length > 0) {
             // Prone to overflow attacks
+            // Sanitize input!
             return UsersResolvers.users.filter((user) =>
                 user.name
                     .toLowerCase()
@@ -61,8 +57,15 @@ export class UsersResolvers {
         return UsersResolvers.users;
     }
 
-    @FieldResolver((_returns) => [Post!]!)
+    @FieldResolver((_returns) => [Post]!, { nullable: true })
     posts(@Root() user: User): ReadonlyArray<PostData> {
         return PostResolvers.posts.filter((post) => post.author === user.id);
+    }
+
+    @FieldResolver((_returns) => [Comment]!, { nullable: true })
+    comments(@Root() user: User): ReadonlyArray<CommentData> {
+        return CommentResolvers.comments.filter(
+            (comment) => comment.author === user.id
+        );
     }
 }

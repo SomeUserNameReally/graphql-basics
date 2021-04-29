@@ -3,6 +3,18 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type Comment {
+  author: User!
+  date: DateTime!
+  id: String!
+  text: String!
+}
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
 type Post {
   author: User!
   body: String!
@@ -12,17 +24,22 @@ type Post {
 }
 
 type Query {
+  comments(query: String): [Comment!]
+  getBaseComment: Comment!
   getBasePost: Post!
+  getComment(id: String!): Comment
+  getPost(id: String!): Post
   me: User!
-  posts(query: String): [Post!]!
+  posts(query: String): [Post!]
   user(id: String!): User
-  users(query: String): [User!]!
+  users(query: String): [User!]
 }
 
 type User {
   age: Int
+  comments: [Comment!]
   email: String!
   id: String!
   name: String!
-  posts: [Post!]!
+  posts: [Post!]
 }
