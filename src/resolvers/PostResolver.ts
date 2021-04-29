@@ -1,6 +1,8 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
+import Comment from "../schema/Comment";
 import Post from "../schema/Post";
 import User from "../schema/User";
+import { CommentData, CommentResolvers } from "./CommentResolver";
 import { UsersResolvers, UserData } from "./UserResolver";
 
 export interface PostData {
@@ -9,6 +11,7 @@ export interface PostData {
     body: string;
     published: boolean;
     author: string;
+    comments: string[];
 }
 
 @Resolver((_of) => Post)
@@ -19,21 +22,24 @@ export class PostResolvers {
             title: "Post 1",
             body: "Post 1 body",
             published: true,
-            author: "456"
-        },
-        {
-            id: "456",
-            title: "Post 2",
-            body: "Post 2 body",
-            published: false,
-            author: "456"
+            author: "456",
+            comments: ["daad32sdfdsd"]
         },
         {
             id: "1239d980fdn34kjldsf9034kl",
+            title: "Post 2",
+            body: "Post 2 body",
+            published: false,
+            author: "456",
+            comments: ["wesffsd89324jhk"]
+        },
+        {
+            id: "456",
             title: "This is my first post!",
             body: "This is the body for my first post!",
             published: true,
-            author: "123"
+            author: "123",
+            comments: ["sdf98032rjhi"]
         }
     ]);
 
@@ -70,5 +76,12 @@ export class PostResolvers {
     @FieldResolver((_returns) => User, { nullable: true })
     author(@Root() post: Post): UserData | undefined {
         return UsersResolvers.users.find((user) => user.id === post.author);
+    }
+
+    @FieldResolver((_returns) => [Comment]!, { nullable: true })
+    comments(@Root() post: Post): CommentData[] {
+        return CommentResolvers.comments.filter((comment) =>
+            post.comments.includes(comment.id)
+        );
     }
 }

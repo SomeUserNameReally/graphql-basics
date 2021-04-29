@@ -7,6 +7,7 @@ type Comment {
   author: User!
   date: DateTime!
   id: String!
+  post: Post!
   text: String!
 }
 
@@ -18,6 +19,7 @@ scalar DateTime
 type Post {
   author: User!
   body: String!
+  comments: [Comment!]
   id: String!
   published: Boolean!
   title: String!

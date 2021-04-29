@@ -1,12 +1,15 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import Comment from "../schema/Comment";
+import Post from "../schema/Post";
 import User from "../schema/User";
+import { PostData, PostResolvers } from "./PostResolver";
 import { UsersResolvers, UserData } from "./UserResolver";
 
 export interface CommentData {
     id: string;
     date: Date;
     text: string;
+    post: string;
     author: string;
 }
 
@@ -17,18 +20,21 @@ export class CommentResolvers {
             id: "daad32sdfdsd",
             date: new Date(),
             text: "Comment 1",
+            post: "123",
             author: "456"
         },
         {
             id: "sdf98032rjhi",
             date: new Date(),
             text: "Comment 2",
+            post: "456",
             author: "456"
         },
         {
             id: "wesffsd89324jhk",
             date: new Date(),
             text: "Comment 3",
+            post: "1239d980fdn34kjldsf9034kl",
             author: "123"
         }
     ]);
@@ -66,5 +72,10 @@ export class CommentResolvers {
     @FieldResolver((_returns) => User, { nullable: true })
     author(@Root() comment: Comment): UserData | undefined {
         return UsersResolvers.users.find((user) => user.id === comment.author);
+    }
+
+    @FieldResolver((_returns) => Post, { nullable: true })
+    post(@Root() comment: Comment): PostData | undefined {
+        return PostResolvers.posts.find((post) => post.id === comment.post);
     }
 }
