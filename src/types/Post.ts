@@ -1,10 +1,10 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, ID, ObjectType } from "type-graphql";
 import Comment from "./Comment";
 import User from "./User";
 
 @ObjectType()
 export default class Post {
-    @Field()
+    @Field(() => ID)
     id!: string;
 
     @Field()

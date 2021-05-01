@@ -1,9 +1,18 @@
-import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
+import {
+    Arg,
+    FieldResolver,
+    Mutation,
+    Query,
+    Resolver,
+    Root
+} from "type-graphql";
+import { v4 as uuidv4 } from "uuid";
 import User from "../types/User";
 import { PostResolvers, PostData } from "./PostResolver";
 import Post from "../types/Post";
 import { CommentData, CommentResolvers } from "./CommentResolver";
 import Comment from "../types/Comment";
+import { AddUserInput } from "../types/AddUser";
 
 export interface UserData {
     id: string;
@@ -14,7 +23,7 @@ export interface UserData {
 
 @Resolver(() => User)
 export class UsersResolvers {
-    static readonly users: ReadonlyArray<UserData> = Object.freeze([
+    static users: UserData[] = [
         {
             id: "123",
             age: 29,
@@ -28,7 +37,7 @@ export class UsersResolvers {
             email: "jennie@me.com",
             name: "Jennie"
         }
-    ]);
+    ];
 
     @Query((_returns) => User!)
     me(): UserData {
@@ -67,5 +76,25 @@ export class UsersResolvers {
         return CommentResolvers.comments.filter(
             (comment) => comment.author === user.id
         );
+    }
+
+    @Mutation((_returns) => User!)
+    addUser(@Arg("newUser") { name, email, age }: AddUserInput): UserData {
+        const userExists = UsersResolvers.users.some(
+            (user) => user.email === email
+        );
+
+        if (userExists) throw new Error("Duplicate user!");
+
+        const newUser: UserData = {
+            id: uuidv4(),
+            email,
+            name,
+            age
+        };
+
+        UsersResolvers.users.push(newUser);
+
+        return newUser;
     }
 }
