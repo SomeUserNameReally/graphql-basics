@@ -1,9 +1,9 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
-import User from "../schema/User";
+import User from "../types/User";
 import { PostResolvers, PostData } from "./PostResolver";
-import Post from "../schema/Post";
+import Post from "../types/Post";
 import { CommentData, CommentResolvers } from "./CommentResolver";
-import Comment from "../schema/Comment";
+import Comment from "../types/Comment";
 
 export interface UserData {
     id: string;

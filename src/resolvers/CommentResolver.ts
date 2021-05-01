@@ -1,7 +1,7 @@
 import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
-import Comment from "../schema/Comment";
-import Post from "../schema/Post";
-import User from "../schema/User";
+import Comment from "../types/Comment";
+import Post from "../types/Post";
+import User from "../types/User";
 import { PostData, PostResolvers } from "./PostResolver";
 import { UsersResolvers, UserData } from "./UserResolver";
 
