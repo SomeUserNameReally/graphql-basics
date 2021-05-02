@@ -2,20 +2,12 @@ import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import Comment from "../types/Comment";
 import Post from "../types/Post";
 import User from "../types/User";
-import { PostData, PostResolvers } from "./PostResolver";
-import { UsersResolvers, UserData } from "./UserResolver";
-
-export interface CommentData {
-    id: string;
-    date: Date;
-    text: string;
-    post: string;
-    author: string;
-}
+import { PostResolvers } from "./PostResolver";
+import { UsersResolvers } from "./UserResolver";
 
 @Resolver((_of) => Comment)
 export class CommentResolvers {
-    static readonly comments: ReadonlyArray<CommentData> = Object.freeze([
+    static readonly comments: ReadonlyArray<Comment> = Object.freeze([
         {
             id: "daad32sdfdsd",
             date: new Date(),
@@ -40,7 +32,7 @@ export class CommentResolvers {
     ]);
 
     @Query((_returns) => Comment!)
-    getBaseComment(): CommentData {
+    getBaseComment(): Comment {
         return CommentResolvers.comments[2]!;
     }
 
@@ -48,7 +40,7 @@ export class CommentResolvers {
     getComment(
         @Arg("id")
         id: string
-    ): CommentData | undefined {
+    ): Comment | undefined {
         return CommentResolvers.comments.find((comment) => comment.id === id);
     }
 
@@ -56,7 +48,7 @@ export class CommentResolvers {
     comments(
         @Arg("query", { nullable: true })
         query?: string
-    ): ReadonlyArray<CommentData> {
+    ): ReadonlyArray<Comment> {
         if (query && query.trim().length > 0) {
             // Prone to overflow attacks
             // Sanitize input!
@@ -70,12 +62,12 @@ export class CommentResolvers {
     }
 
     @FieldResolver((_returns) => User, { nullable: true })
-    author(@Root() comment: Comment): UserData | undefined {
+    author(@Root() comment: Comment): User | undefined {
         return UsersResolvers.users.find((user) => user.id === comment.author);
     }
 
     @FieldResolver((_returns) => Post, { nullable: true })
-    post(@Root() comment: Comment): PostData | undefined {
+    post(@Root() comment: Comment): Post | undefined {
         return PostResolvers.posts.find((post) => post.id === comment.post);
     }
 }

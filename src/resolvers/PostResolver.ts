@@ -2,21 +2,12 @@ import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
 import Comment from "../types/Comment";
 import Post from "../types/Post";
 import User from "../types/User";
-import { CommentData, CommentResolvers } from "./CommentResolver";
-import { UsersResolvers, UserData } from "./UserResolver";
-
-export interface PostData {
-    id: string;
-    title: string;
-    body: string;
-    published: boolean;
-    author: string;
-    comments: string[];
-}
+import { CommentResolvers } from "./CommentResolver";
+import { UsersResolvers } from "./UserResolver";
 
 @Resolver((_of) => Post)
 export class PostResolvers {
-    static readonly posts: ReadonlyArray<PostData> = Object.freeze([
+    static readonly posts: ReadonlyArray<Post> = Object.freeze([
         {
             id: "123",
             title: "Post 1",
@@ -44,7 +35,7 @@ export class PostResolvers {
     ]);
 
     @Query((_returns) => Post!)
-    getBasePost(): PostData {
+    getBasePost(): Post {
         return PostResolvers.posts[2]!;
     }
 
@@ -52,7 +43,7 @@ export class PostResolvers {
     getPost(
         @Arg("id")
         id: string
-    ): PostData | undefined {
+    ): Post | undefined {
         return PostResolvers.posts.find((post) => post.id === id);
     }
 
@@ -60,7 +51,7 @@ export class PostResolvers {
     posts(
         @Arg("query", { nullable: true })
         query?: string
-    ): ReadonlyArray<PostData> {
+    ): ReadonlyArray<Post> {
         if (query && query.trim().length > 0) {
             // Prone to overflow attacks
             // Sanitize input!
@@ -74,12 +65,12 @@ export class PostResolvers {
     }
 
     @FieldResolver((_returns) => User, { nullable: true })
-    author(@Root() post: Post): UserData | undefined {
+    author(@Root() post: Post): User | undefined {
         return UsersResolvers.users.find((user) => user.id === post.author);
     }
 
     @FieldResolver((_returns) => [Comment]!, { nullable: true })
-    comments(@Root() post: Post): CommentData[] {
+    comments(@Root() post: Post): Comment[] {
         return CommentResolvers.comments.filter((comment) =>
             post.comments.includes(comment.id)
         );

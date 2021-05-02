@@ -8,51 +8,44 @@ import {
 } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
 import User from "../types/User";
-import { PostResolvers, PostData } from "./PostResolver";
+import { PostResolvers } from "./PostResolver";
 import Post from "../types/Post";
-import { CommentData, CommentResolvers } from "./CommentResolver";
+import { CommentResolvers } from "./CommentResolver";
 import Comment from "../types/Comment";
-import { AddUserInput } from "../types/AddUser";
-
-export interface UserData {
-    id: string;
-    name: string;
-    email: string;
-    age?: number;
-}
+import { AddUserInput } from "../types/AddUserInput";
 
 @Resolver(() => User)
 export class UsersResolvers {
-    static users: UserData[] = [
-        {
-            id: "123",
-            age: 29,
-            email: "me@me.com",
-            name: "ajay"
-        },
-
+    static users: User[] = [
         {
             id: "456",
             age: 25,
-            email: "jennie@me.com",
-            name: "Jennie"
+            email: "user1@email.com",
+            name: "User 1"
+        },
+
+        {
+            id: "123",
+            age: 29,
+            email: "user2@email.com",
+            name: "User 2"
         }
     ];
 
     @Query((_returns) => User!)
-    me(): UserData {
+    me(): User {
         return UsersResolvers.users[1]!;
     }
 
     @Query((_returns) => User, { nullable: true })
-    user(@Arg("id") id: string): UserData | undefined {
+    user(@Arg("id") id: string): User | undefined {
         return UsersResolvers.users.find((user) => user.id === id);
     }
 
     @Query((_returns) => [User]!, { nullable: true })
     users(
         @Arg("query", { nullable: true }) query?: string
-    ): ReadonlyArray<UserData> {
+    ): ReadonlyArray<User> {
         if (query && query.length > 0) {
             // Prone to overflow attacks
             // Sanitize input!
@@ -67,26 +60,26 @@ export class UsersResolvers {
     }
 
     @FieldResolver((_returns) => [Post]!, { nullable: true })
-    posts(@Root() user: User): ReadonlyArray<PostData> {
+    posts(@Root() user: User): ReadonlyArray<Post> {
         return PostResolvers.posts.filter((post) => post.author === user.id);
     }
 
     @FieldResolver((_returns) => [Comment]!, { nullable: true })
-    comments(@Root() user: User): ReadonlyArray<CommentData> {
+    comments(@Root() user: User): ReadonlyArray<Comment> {
         return CommentResolvers.comments.filter(
             (comment) => comment.author === user.id
         );
     }
 
     @Mutation((_returns) => User!)
-    addUser(@Arg("newUser") { name, email, age }: AddUserInput): UserData {
+    addUser(@Arg("newUser") { name, email, age }: AddUserInput): User {
         const userExists = UsersResolvers.users.some(
             (user) => user.email === email
         );
 
         if (userExists) throw new Error("Duplicate user!");
 
-        const newUser: UserData = {
+        const newUser: User = {
             id: uuidv4(),
             email,
             name,
