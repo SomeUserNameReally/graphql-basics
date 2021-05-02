@@ -7,7 +7,7 @@ import { UsersResolvers } from "./UserResolver";
 
 @Resolver((_of) => Comment)
 export class CommentResolvers {
-    static readonly comments: ReadonlyArray<Comment> = Object.freeze([
+    static comments: Comment[] = [
         {
             id: "daad32sdfdsd",
             date: new Date(),
@@ -29,7 +29,7 @@ export class CommentResolvers {
             post: "1239d980fdn34kjldsf9034kl",
             author: "123"
         }
-    ]);
+    ];
 
     @Query((_returns) => Comment!)
     getBaseComment(): Comment {

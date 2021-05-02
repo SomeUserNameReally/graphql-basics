@@ -7,7 +7,7 @@ import { UsersResolvers } from "./UserResolver";
 
 @Resolver((_of) => Post)
 export class PostResolvers {
-    static readonly posts: ReadonlyArray<Post> = Object.freeze([
+    static posts: Post[] = [
         {
             id: "123",
             title: "Post 1",
@@ -32,7 +32,7 @@ export class PostResolvers {
             author: "123",
             comments: ["sdf98032rjhi"]
         }
-    ]);
+    ];
 
     @Query((_returns) => Post!)
     getBasePost(): Post {
