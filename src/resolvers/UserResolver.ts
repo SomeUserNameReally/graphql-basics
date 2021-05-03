@@ -12,7 +12,7 @@ import { PostResolvers } from "./PostResolver";
 import Post from "../types/Post";
 import { CommentResolvers } from "./CommentResolver";
 import Comment from "../types/Comment";
-import { AddUserInput } from "../types/AddUserInput";
+import { AddUserInput } from "../types/inputs/AddUserInput";
 
 @Resolver(() => User)
 export class UsersResolvers {
@@ -79,15 +79,15 @@ export class UsersResolvers {
 
         if (userExists) throw new Error("Duplicate user!");
 
-        const newUser: User = {
+        const user: User = {
             id: uuidv4(),
             email,
             name,
             age
         };
 
-        UsersResolvers.users.push(newUser);
+        UsersResolvers.users.push(user);
 
-        return newUser;
+        return user;
     }
 }

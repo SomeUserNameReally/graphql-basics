@@ -3,6 +3,13 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+input AddPostInput {
+  author: String!
+  body: String!
+  published: Boolean!
+  title: String!
+}
+
 input AddUserInput {
   age: Float
   email: String!
@@ -23,6 +30,7 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Mutation {
+  addPost(newPost: AddPostInput!): Post!
   addUser(newUser: AddUserInput!): User!
 }
 
