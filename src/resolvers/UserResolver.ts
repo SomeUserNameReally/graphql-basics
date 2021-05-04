@@ -8,33 +8,16 @@ import {
 } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
 import User from "../types/User";
-import { PostResolvers } from "./PostResolver";
 import Post from "../types/Post";
-import { CommentResolvers } from "./CommentResolver";
 import Comment from "../types/Comment";
 import { AddUserInput } from "../types/inputs/AddUserInput";
+import db from "../db";
 
 @Resolver(() => User)
 export class UsersResolvers {
-    static users: User[] = [
-        {
-            id: "456",
-            age: 25,
-            email: "user1@email.com",
-            name: "User 1"
-        },
-
-        {
-            id: "123",
-            age: 29,
-            email: "user2@email.com",
-            name: "User 2"
-        }
-    ];
-
     @Query((_returns) => User, { nullable: true })
     user(@Arg("id") id: string): User | undefined {
-        return UsersResolvers.users.find((user) => user.id === id);
+        return db.users.find((user) => user.id === id);
     }
 
     @Query((_returns) => [User]!, { nullable: true })
@@ -42,31 +25,29 @@ export class UsersResolvers {
         if (query && query.length > 0) {
             // Prone to overflow attacks
             // Sanitize input!
-            return UsersResolvers.users.filter((user) =>
+            return db.users.filter((user) =>
                 user.name
                     .toLowerCase()
                     .match(new RegExp(query.toLowerCase(), "g"))
             );
         }
 
-        return UsersResolvers.users;
+        return db.users;
     }
 
     @FieldResolver((_returns) => [Post]!, { nullable: true })
     posts(@Root() user: User): Post[] {
-        return PostResolvers.posts.filter((post) => post.author === user.id);
+        return db.posts.filter((post) => post.author === user.id);
     }
 
     @FieldResolver((_returns) => [Comment]!, { nullable: true })
     comments(@Root() user: User): Comment[] {
-        return CommentResolvers.comments.filter(
-            (comment) => comment.author === user.id
-        );
+        return db.comments.filter((comment) => comment.author === user.id);
     }
 
     @Mutation((_returns) => User!)
     addUser(@Arg("newUser") newPost: AddUserInput): User {
-        const userExists = UsersResolvers.users.some(
+        const userExists = db.users.some(
             (user) => user.email === newPost.email
         );
 
@@ -77,24 +58,22 @@ export class UsersResolvers {
             ...newPost
         };
 
-        UsersResolvers.users.push(user);
+        db.users.push(user);
 
         return user;
     }
 
     @Mutation((_returns) => User!)
     deleteUser(@Arg("id") id: string): User {
-        const foundUserIndex = UsersResolvers.users.findIndex(
-            (user) => user.id === id
-        );
+        const foundUserIndex = db.users.findIndex((user) => user.id === id);
 
         if (foundUserIndex === -1) throw new Error("No such user!");
 
-        PostResolvers.posts = PostResolvers.posts.filter((post) => {
+        db.posts = db.posts.filter((post) => {
             const match = post.author !== id;
 
             if (match) {
-                CommentResolvers.comments = CommentResolvers.comments.filter(
+                db.comments = db.comments.filter(
                     (comment) => comment.post !== post.id
                 );
             }
@@ -102,10 +81,8 @@ export class UsersResolvers {
             return !match;
         });
 
-        CommentResolvers.comments = CommentResolvers.comments.filter(
-            (comment) => comment.author !== id
-        );
+        db.comments = db.comments.filter((comment) => comment.author !== id);
 
-        return UsersResolvers.users.splice(foundUserIndex, 1)[0]!;
+        return db.users.splice(foundUserIndex, 1)[0]!;
     }
 }
