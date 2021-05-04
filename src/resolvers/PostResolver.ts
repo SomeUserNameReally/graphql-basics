@@ -43,11 +43,6 @@ export class PostResolvers {
         }
     ];
 
-    @Query((_returns) => Post!)
-    getBasePost(): Post {
-        return PostResolvers.posts[2]!;
-    }
-
     @Query((_returns) => Post, { nullable: true })
     getPost(
         @Arg("id")

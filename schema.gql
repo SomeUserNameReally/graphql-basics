@@ -55,11 +55,8 @@ type Post {
 
 type Query {
   comments(query: String): [Comment!]
-  getBaseComment: Comment!
-  getBasePost: Post!
   getComment(id: String!): Comment
   getPost(id: String!): Post
-  me: User!
   posts(query: String): [Post!]
   user(id: String!): User
   users(query: String): [User!]

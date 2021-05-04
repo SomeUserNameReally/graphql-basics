@@ -40,11 +40,6 @@ export class CommentResolvers {
         }
     ];
 
-    @Query((_returns) => Comment!)
-    getBaseComment(): Comment {
-        return CommentResolvers.comments[2]!;
-    }
-
     @Query((_returns) => Comment, { nullable: true })
     getComment(
         @Arg("id")

@@ -32,11 +32,6 @@ export class UsersResolvers {
         }
     ];
 
-    @Query((_returns) => User!)
-    me(): User {
-        return UsersResolvers.users[1]!;
-    }
-
     @Query((_returns) => User, { nullable: true })
     user(@Arg("id") id: string): User | undefined {
         return UsersResolvers.users.find((user) => user.id === id);
