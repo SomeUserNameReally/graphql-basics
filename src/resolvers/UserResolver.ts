@@ -17,44 +17,47 @@ import { GraphQLContext } from "../typings/global";
 @Resolver(() => User)
 export class UsersResolvers {
     @Query((_returns) => User, { nullable: true })
-    user(@Ctx() ctx: GraphQLContext, @Arg("id") id: string): User | undefined {
-        return ctx.db.users.find((user) => user.id === id);
+    user(
+        @Ctx() { db }: GraphQLContext,
+        @Arg("id") id: string
+    ): User | undefined {
+        return db.users.find((user) => user.id === id);
     }
 
     @Query((_returns) => [User]!, { nullable: true })
     users(
-        @Ctx() ctx: GraphQLContext,
+        @Ctx() { db }: GraphQLContext,
         @Arg("query", { nullable: true }) query?: string
     ): User[] {
         if (query && query.length > 0) {
             // Prone to overflow attacks
             // Sanitize input!
-            return ctx.db.users.filter((user) =>
+            return db.users.filter((user) =>
                 user.name
                     .toLowerCase()
                     .match(new RegExp(query.toLowerCase(), "g"))
             );
         }
 
-        return ctx.db.users;
+        return db.users;
     }
 
     @FieldResolver((_returns) => [Post]!, { nullable: true })
-    posts(@Ctx() ctx: GraphQLContext, @Root() user: User): Post[] {
-        return ctx.db.posts.filter((post) => post.author === user.id);
+    posts(@Ctx() { db }: GraphQLContext, @Root() user: User): Post[] {
+        return db.posts.filter((post) => post.author === user.id);
     }
 
     @FieldResolver((_returns) => [Comment]!, { nullable: true })
-    comments(@Ctx() ctx: GraphQLContext, @Root() user: User): Comment[] {
-        return ctx.db.comments.filter((comment) => comment.author === user.id);
+    comments(@Ctx() { db }: GraphQLContext, @Root() user: User): Comment[] {
+        return db.comments.filter((comment) => comment.author === user.id);
     }
 
     @Mutation((_returns) => User!)
     addUser(
-        @Ctx() ctx: GraphQLContext,
+        @Ctx() { db }: GraphQLContext,
         @Arg("newUser") newPost: AddUserInput
     ): User {
-        const userExists = ctx.db.users.some(
+        const userExists = db.users.some(
             (user) => user.email === newPost.email
         );
 
@@ -65,22 +68,22 @@ export class UsersResolvers {
             ...newPost
         };
 
-        ctx.db.users.push(user);
+        db.users.push(user);
 
         return user;
     }
 
     @Mutation((_returns) => User!)
-    deleteUser(@Ctx() ctx: GraphQLContext, @Arg("id") id: string): User {
-        const foundUserIndex = ctx.db.users.findIndex((user) => user.id === id);
+    deleteUser(@Ctx() { db }: GraphQLContext, @Arg("id") id: string): User {
+        const foundUserIndex = db.users.findIndex((user) => user.id === id);
 
         if (foundUserIndex === -1) throw new Error("No such user!");
 
-        ctx.db.posts = ctx.db.posts.filter((post) => {
+        db.posts = db.posts.filter((post) => {
             const match = post.author !== id;
 
             if (match) {
-                ctx.db.comments = ctx.db.comments.filter(
+                db.comments = db.comments.filter(
                     (comment) => comment.post !== post.id
                 );
             }
@@ -88,10 +91,8 @@ export class UsersResolvers {
             return !match;
         });
 
-        ctx.db.comments = ctx.db.comments.filter(
-            (comment) => comment.author !== id
-        );
+        db.comments = db.comments.filter((comment) => comment.author !== id);
 
-        return ctx.db.users.splice(foundUserIndex, 1)[0]!;
+        return db.users.splice(foundUserIndex, 1)[0]!;
     }
 }
