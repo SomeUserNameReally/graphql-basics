@@ -103,4 +103,19 @@ export class PostResolvers {
 
         return post;
     }
+
+    @Mutation((_returns) => Post!)
+    deletePost(@Arg("id") id: string): Post {
+        const postIndex = PostResolvers.posts.findIndex(
+            (post) => post.id === id
+        );
+
+        if (postIndex === -1) throw new Error("No such post!");
+
+        CommentResolvers.comments = CommentResolvers.comments.filter(
+            (comment) => comment.post !== id
+        );
+
+        return PostResolvers.posts.splice(postIndex, 1)[0]!;
+    }
 }
