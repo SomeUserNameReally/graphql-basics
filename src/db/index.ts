@@ -2,7 +2,7 @@ import Comment from "../types/Comment";
 import Post from "../types/Post";
 import User from "../types/User";
 
-let users: User[] = [
+const users: User[] = [
     {
         id: "456",
         age: 25,
@@ -18,7 +18,7 @@ let users: User[] = [
     }
 ];
 
-let posts: Post[] = [
+const posts: Post[] = [
     {
         id: "123",
         title: "Post 1",
@@ -45,7 +45,7 @@ let posts: Post[] = [
     }
 ];
 
-let comments: Comment[] = [
+const comments: Comment[] = [
     {
         id: "daad32sdfdsd",
         date: new Date(),
