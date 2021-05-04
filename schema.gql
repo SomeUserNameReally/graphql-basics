@@ -3,6 +3,12 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+input AddCommentInput {
+  author: String!
+  post: String!
+  text: String!
+}
+
 input AddPostInput {
   author: String!
   body: String!
@@ -30,6 +36,7 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Mutation {
+  addComment(newComment: AddCommentInput!): Comment!
   addPost(newPost: AddPostInput!): Post!
   addUser(newUser: AddUserInput!): User!
 }

@@ -72,18 +72,16 @@ export class UsersResolvers {
     }
 
     @Mutation((_returns) => User!)
-    addUser(@Arg("newUser") { name, email, age }: AddUserInput): User {
+    addUser(@Arg("newUser") newPost: AddUserInput): User {
         const userExists = UsersResolvers.users.some(
-            (user) => user.email === email
+            (user) => user.email === newPost.email
         );
 
         if (userExists) throw new Error("Duplicate user!");
 
         const user: User = {
             id: uuidv4(),
-            email,
-            name,
-            age
+            ...newPost
         };
 
         UsersResolvers.users.push(user);

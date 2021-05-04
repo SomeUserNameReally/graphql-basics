@@ -86,21 +86,16 @@ export class PostResolvers {
     }
 
     @Mutation((_returns) => Post!)
-    addPost(
-        @Arg("newPost") { title, body, published, author }: AddPostInput
-    ): Post {
+    addPost(@Arg("newPost") newPost: AddPostInput): Post {
         const userExists = UsersResolvers.users.some(
-            (user) => user.id === author
+            (user) => user.id === newPost.author
         );
 
         if (!userExists) throw new Error("No such user!");
 
         const post: Post = {
             id: uuidv4(),
-            title,
-            body,
-            author,
-            published,
+            ...newPost,
             comments: []
         };
 

@@ -1,5 +1,14 @@
-import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
+import {
+    Arg,
+    FieldResolver,
+    Mutation,
+    Query,
+    Resolver,
+    Root
+} from "type-graphql";
+import { v4 as uuidv4 } from "uuid";
 import Comment from "../types/Comment";
+import { AddCommentInput } from "../types/inputs/AddCommentInput";
 import Post from "../types/Post";
 import User from "../types/User";
 import { PostResolvers } from "./PostResolver";
@@ -69,5 +78,29 @@ export class CommentResolvers {
     @FieldResolver((_returns) => Post, { nullable: true })
     post(@Root() comment: Comment): Post | undefined {
         return PostResolvers.posts.find((post) => post.id === comment.post);
+    }
+
+    @Mutation((_returns) => Comment!)
+    addComment(@Arg("newComment") newComment: AddCommentInput): Comment {
+        const userExists = UsersResolvers.users.some(
+            (user) => user.id === newComment.author
+        );
+
+        const postExists = PostResolvers.posts.some(
+            (post) => post.id === newComment.post && post.published
+        );
+
+        if (!userExists) throw new Error("No such user!");
+        if (!postExists) throw new Error("Post not found!");
+
+        const comment: Comment = {
+            id: uuidv4(),
+            date: new Date(),
+            ...newComment
+        };
+
+        CommentResolvers.comments.push(comment);
+
+        return comment;
     }
 }
