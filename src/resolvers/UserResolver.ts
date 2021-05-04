@@ -30,7 +30,6 @@ export class UsersResolvers {
         @Arg("query", { nullable: true }) query?: string
     ): User[] {
         if (query && query.length > 0) {
-            // Prone to overflow attacks
             // Sanitize input!
             return db.users.filter((user) =>
                 user.name
@@ -80,7 +79,7 @@ export class UsersResolvers {
         if (foundUserIndex === -1) throw new Error("No such user!");
 
         db.posts = db.posts.filter((post) => {
-            const match = post.author !== id;
+            const match = post.author === id;
 
             if (match) {
                 db.comments = db.comments.filter(

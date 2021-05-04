@@ -32,7 +32,6 @@ export class CommentResolvers {
         query?: string
     ): Comment[] {
         if (query && query.trim().length > 0) {
-            // Prone to overflow attacks
             // Sanitize input!
             const re = new RegExp(query.trim().toLowerCase(), "g");
             return db.comments.filter((comment) =>
@@ -72,7 +71,7 @@ export class CommentResolvers {
             (post) => post.id === newComment.post && post.published
         );
 
-        if (!userExists) throw new Error("No such user!");
+        if (!userExists) throw new Error("User not found!");
         if (!postExists) throw new Error("Post not found!");
 
         const comment: Comment = {

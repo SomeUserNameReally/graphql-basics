@@ -32,7 +32,6 @@ export class PostResolvers {
         query?: string
     ): Post[] {
         if (query && query.trim().length > 0) {
-            // Prone to overflow attacks
             // Sanitize input!
             const re = new RegExp(query.trim().toLowerCase(), "g");
             return db.posts.filter((post) => re.exec(post.title.toLowerCase()));
