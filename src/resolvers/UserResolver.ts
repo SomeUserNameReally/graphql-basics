@@ -88,4 +88,31 @@ export class UsersResolvers {
 
         return user;
     }
+
+    @Mutation((_returns) => User!)
+    deleteUser(@Arg("id") id: string): User {
+        const foundUserIndex = UsersResolvers.users.findIndex(
+            (user) => user.id === id
+        );
+
+        if (foundUserIndex === -1) throw new Error("No such user!");
+
+        PostResolvers.posts = PostResolvers.posts.filter((post) => {
+            const match = post.author !== id;
+
+            if (match) {
+                CommentResolvers.comments = CommentResolvers.comments.filter(
+                    (comment) => comment.post !== post.id
+                );
+            }
+
+            return !match;
+        });
+
+        CommentResolvers.comments = CommentResolvers.comments.filter(
+            (comment) => comment.author !== id
+        );
+
+        return UsersResolvers.users.splice(foundUserIndex, 1)[0]!;
+    }
 }

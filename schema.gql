@@ -39,6 +39,7 @@ type Mutation {
   addComment(newComment: AddCommentInput!): Comment!
   addPost(newPost: AddPostInput!): Post!
   addUser(newUser: AddUserInput!): User!
+  deleteUser(id: String!): User!
 }
 
 type Post {
