@@ -103,4 +103,15 @@ export class CommentResolvers {
 
         return comment;
     }
+
+    @Mutation((_returns) => Comment!)
+    deleteComment(@Arg("id") id: string): Comment {
+        const commentIndex = CommentResolvers.comments.findIndex(
+            (comment) => comment.id === id
+        );
+
+        if (commentIndex === -1) throw new Error("No such Comment!");
+
+        return CommentResolvers.comments.splice(commentIndex, 1)[0]!;
+    }
 }
