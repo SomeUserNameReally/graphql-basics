@@ -57,7 +57,7 @@ export class CommentResolvers {
     comments(
         @Arg("query", { nullable: true })
         query?: string
-    ): ReadonlyArray<Comment> {
+    ): Comment[] {
         if (query && query.trim().length > 0) {
             // Prone to overflow attacks
             // Sanitize input!

@@ -60,7 +60,7 @@ export class PostResolvers {
     posts(
         @Arg("query", { nullable: true })
         query?: string
-    ): ReadonlyArray<Post> {
+    ): Post[] {
         if (query && query.trim().length > 0) {
             // Prone to overflow attacks
             // Sanitize input!

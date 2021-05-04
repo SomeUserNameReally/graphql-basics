@@ -43,9 +43,7 @@ export class UsersResolvers {
     }
 
     @Query((_returns) => [User]!, { nullable: true })
-    users(
-        @Arg("query", { nullable: true }) query?: string
-    ): ReadonlyArray<User> {
+    users(@Arg("query", { nullable: true }) query?: string): User[] {
         if (query && query.length > 0) {
             // Prone to overflow attacks
             // Sanitize input!
@@ -60,12 +58,12 @@ export class UsersResolvers {
     }
 
     @FieldResolver((_returns) => [Post]!, { nullable: true })
-    posts(@Root() user: User): ReadonlyArray<Post> {
+    posts(@Root() user: User): Post[] {
         return PostResolvers.posts.filter((post) => post.author === user.id);
     }
 
     @FieldResolver((_returns) => [Comment]!, { nullable: true })
-    comments(@Root() user: User): ReadonlyArray<Comment> {
+    comments(@Root() user: User): Comment[] {
         return CommentResolvers.comments.filter(
             (comment) => comment.author === user.id
         );
