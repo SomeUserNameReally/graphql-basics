@@ -3,6 +3,7 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server";
 import { buildSchema } from "type-graphql";
 import { resolvers } from "./resolvers";
+import db from "./db";
 
 export class Server {
     private static server: ApolloServer;
@@ -19,7 +20,10 @@ export class Server {
         // Create the GraphQL server
         Server.server = new ApolloServer({
             schema,
-            playground: true
+            playground: true,
+            context: {
+                db
+            }
         });
 
         // Start the server

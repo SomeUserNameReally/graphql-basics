@@ -1,5 +1,6 @@
 import {
     Arg,
+    Ctx,
     FieldResolver,
     Mutation,
     Query,
@@ -11,20 +12,22 @@ import Comment from "../types/Comment";
 import { AddCommentInput } from "../types/inputs/AddCommentInput";
 import Post from "../types/Post";
 import User from "../types/User";
-import db from "../db";
+import { GraphQLContext } from "../typings/global";
 
 @Resolver((_of) => Comment)
 export class CommentResolvers {
     @Query((_returns) => Comment, { nullable: true })
     getComment(
+        @Ctx() ctx: GraphQLContext,
         @Arg("id")
         id: string
     ): Comment | undefined {
-        return db.comments.find((comment) => comment.id === id);
+        return ctx.db.comments.find((comment) => comment.id === id);
     }
 
     @Query((_returns) => [Comment]!, { nullable: true })
     comments(
+        @Ctx() ctx: GraphQLContext,
         @Arg("query", { nullable: true })
         query?: string
     ): Comment[] {
@@ -32,31 +35,40 @@ export class CommentResolvers {
             // Prone to overflow attacks
             // Sanitize input!
             const re = new RegExp(query.trim().toLowerCase(), "g");
-            return db.comments.filter((comment) =>
+            return ctx.db.comments.filter((comment) =>
                 re.exec(comment.text.toLowerCase())
             );
         }
 
-        return db.comments;
+        return ctx.db.comments;
     }
 
     @FieldResolver((_returns) => User, { nullable: true })
-    author(@Root() comment: Comment): User | undefined {
-        return db.users.find((user) => user.id === comment.author);
+    author(
+        @Ctx() ctx: GraphQLContext,
+        @Root() comment: Comment
+    ): User | undefined {
+        return ctx.db.users.find((user) => user.id === comment.author);
     }
 
     @FieldResolver((_returns) => Post, { nullable: true })
-    post(@Root() comment: Comment): Post | undefined {
-        return db.posts.find((post) => post.id === comment.post);
+    post(
+        @Ctx() ctx: GraphQLContext,
+        @Root() comment: Comment
+    ): Post | undefined {
+        return ctx.db.posts.find((post) => post.id === comment.post);
     }
 
     @Mutation((_returns) => Comment!)
-    addComment(@Arg("newComment") newComment: AddCommentInput): Comment {
-        const userExists = db.users.some(
+    addComment(
+        @Ctx() ctx: GraphQLContext,
+        @Arg("newComment") newComment: AddCommentInput
+    ): Comment {
+        const userExists = ctx.db.users.some(
             (user) => user.id === newComment.author
         );
 
-        const postExists = db.posts.some(
+        const postExists = ctx.db.posts.some(
             (post) => post.id === newComment.post && post.published
         );
 
@@ -69,19 +81,19 @@ export class CommentResolvers {
             ...newComment
         };
 
-        db.comments.push(comment);
+        ctx.db.comments.push(comment);
 
         return comment;
     }
 
     @Mutation((_returns) => Comment!)
-    deleteComment(@Arg("id") id: string): Comment {
-        const commentIndex = db.comments.findIndex(
+    deleteComment(@Ctx() ctx: GraphQLContext, @Arg("id") id: string): Comment {
+        const commentIndex = ctx.db.comments.findIndex(
             (comment) => comment.id === id
         );
 
         if (commentIndex === -1) throw new Error("No such Comment!");
 
-        return db.comments.splice(commentIndex, 1)[0]!;
+        return ctx.db.comments.splice(commentIndex, 1)[0]!;
     }
 }
