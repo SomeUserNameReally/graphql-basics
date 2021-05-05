@@ -13,6 +13,7 @@ import Post from "../types/Post";
 import Comment from "../types/Comment";
 import { AddUserInput } from "../types/inputs/AddUserInput";
 import { GraphQLContext } from "../typings/global";
+import { UpdateUserInput } from "../types/inputs/UpdateUserInput";
 
 @Resolver(() => User)
 export class UsersResolvers {
@@ -93,5 +94,37 @@ export class UsersResolvers {
         db.comments = db.comments.filter((comment) => comment.author !== id);
 
         return db.users.splice(foundUserIndex, 1)[0]!;
+    }
+
+    @Mutation((_returns) => User!)
+    updateUser(
+        @Ctx() { db }: GraphQLContext,
+        @Arg("userInfo") userInfo: UpdateUserInput
+    ): User {
+        const userIndex = db.users.findIndex((user) => user.id === userInfo.id);
+
+        if (userIndex === -1) throw new Error("No such user");
+
+        if (userInfo.email && userInfo.email.trim().length === 0)
+            throw new Error("Must provide a valid email!");
+        // Other checks...
+
+        const emailTaken = db.users.some(
+            (user) => user.email === userInfo.email
+        );
+        if (emailTaken) throw new Error("Email taken!");
+
+        const newUser: User = {
+            id: userInfo.id,
+            name: userInfo.name || db.users[userIndex]!.name,
+            email: userInfo.email || db.users[userIndex]!.email,
+            age: db.users[userIndex]!.age
+        };
+
+        if (userInfo.age !== undefined) newUser.age = userInfo.age;
+
+        db.users[userIndex] = { ...newUser };
+
+        return newUser;
     }
 }

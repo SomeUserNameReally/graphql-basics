@@ -17,7 +17,7 @@ input AddPostInput {
 }
 
 input AddUserInput {
-  age: Float
+  age: Int
   email: String!
   name: String!
 }
@@ -42,6 +42,7 @@ type Mutation {
   deleteComment(id: String!): Comment!
   deletePost(id: String!): Post!
   deleteUser(id: String!): User!
+  updateUser(userInfo: UpdateUserInput!): User!
 }
 
 type Post {
@@ -60,6 +61,13 @@ type Query {
   posts(query: String): [Post!]
   user(id: String!): User
   users(query: String): [User!]
+}
+
+input UpdateUserInput {
+  age: Int
+  email: String
+  id: ID!
+  name: String
 }
 
 type User {
