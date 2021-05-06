@@ -115,12 +115,11 @@ export class UsersResolvers {
         if (emailTaken) throw new Error("Email taken!");
 
         const newUser: User = {
-            id: userInfo.id,
-            name: userInfo.name || db.users[userIndex]!.name,
-            email: userInfo.email || db.users[userIndex]!.email,
-            age: db.users[userIndex]!.age
+            ...db.users[userIndex]!
         };
 
+        if (userInfo.name) newUser.name = userInfo.name;
+        if (userInfo.email) newUser.email = userInfo.email;
         if (userInfo.age !== undefined) newUser.age = userInfo.age;
 
         db.users[userIndex] = { ...newUser };

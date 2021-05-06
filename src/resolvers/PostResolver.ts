@@ -10,6 +10,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import Comment from "../types/Comment";
 import { AddPostInput } from "../types/inputs/AddPostInput";
+import { UpdatePostInput } from "../types/inputs/UpdatePostInput";
 import Post from "../types/Post";
 import User from "../types/User";
 import { GraphQLContext } from "../typings/global";
@@ -84,5 +85,31 @@ export class PostResolvers {
         db.comments = db.comments.filter((comment) => comment.post !== id);
 
         return db.posts.splice(postIndex, 1)[0]!;
+    }
+
+    @Mutation((_returns) => Post!)
+    updatePost(
+        @Ctx() { db }: GraphQLContext,
+        @Arg("updatedPost") updatedPost: UpdatePostInput
+    ): Post {
+        const postIndex = db.posts.findIndex(
+            (post) => post.id === updatedPost.id
+        );
+        if (postIndex === -1) throw new Error("No such post!");
+
+        // Run checks
+        // Then
+
+        const newPost: Post = {
+            ...db.posts[postIndex]!
+        };
+
+        if (updatedPost.title) newPost.title = updatedPost.title;
+        if (updatedPost.body) newPost.body = updatedPost.body;
+        if (updatedPost.published) newPost.published = updatedPost.published;
+
+        db.posts[postIndex] = newPost;
+
+        return newPost;
     }
 }
