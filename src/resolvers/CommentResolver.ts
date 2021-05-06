@@ -10,6 +10,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import Comment from "../types/Comment";
 import { AddCommentInput } from "../types/inputs/AddCommentInput";
+import { UpdateCommentInput } from "../types/inputs/UpdateCommentInput";
 import Post from "../types/Post";
 import User from "../types/User";
 import { GraphQLContext } from "../typings/global";
@@ -97,5 +98,27 @@ export class CommentResolvers {
         if (commentIndex === -1) throw new Error("No such Comment!");
 
         return db.comments.splice(commentIndex, 1)[0]!;
+    }
+
+    @Mutation((_returns) => Comment!)
+    updateComment(
+        @Ctx() { db }: GraphQLContext,
+        @Arg("updatedComment") updatedComment: UpdateCommentInput
+    ): Comment {
+        const commentIndex = db.comments.findIndex(
+            (comment) => comment.id === updatedComment.id
+        );
+        if (updatedComment.text.trim().length === 0 || commentIndex === -1)
+            throw new Error("Invalid comment!");
+        // Run other checks
+
+        const newComment: Comment = {
+            ...db.comments[commentIndex]!
+        };
+
+        newComment.date = new Date();
+        newComment.text = updatedComment.text;
+
+        return newComment;
     }
 }
