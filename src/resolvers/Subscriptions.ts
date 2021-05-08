@@ -1,5 +1,6 @@
 import { Subscription, Resolver, Root, Arg } from "type-graphql";
 import Comment from "../types/Comment";
+import CommentSubscriptionPayload from "../types/subscriptions/Comment";
 import PostSubscriptionPayload from "../types/subscriptions/Post";
 
 @Resolver()
@@ -8,7 +9,7 @@ export class Subscriptions {
         topics: ({ args }) => `COMMENT ${args.post}`
     })
     comment(
-        @Root("comment") payload: { comment: Comment },
+        @Root("comment") payload: CommentSubscriptionPayload,
         @Arg("post") post: string
     ) {
         return {

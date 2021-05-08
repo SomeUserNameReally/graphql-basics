@@ -10,11 +10,14 @@ import {
     Root
 } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
+import PubSubImplementation from "../PubSub";
 import Comment from "../types/Comment";
 import { AddCommentInput } from "../types/inputs/AddCommentInput";
 import { UpdateCommentInput } from "../types/inputs/UpdateCommentInput";
 import Post from "../types/Post";
+import CommentSubscriptionPayload from "../types/subscriptions/Comment";
 import User from "../types/User";
+import { SubscriptionMutationPayload } from "../typings/enums/subscriptions";
 import { GraphQLContext } from "../typings/global";
 
 @Resolver((_of) => Comment)
@@ -65,7 +68,7 @@ export class CommentResolvers {
     addComment(
         @Ctx() { db }: GraphQLContext,
         @Arg("newComment") newComment: AddCommentInput,
-        @PubSub() pubsub: PubSubEngine
+        @PubSub() pubsub: PubSubImplementation
     ): Comment {
         const userExists = db.users.some(
             (user) => user.id === newComment.author
@@ -85,7 +88,10 @@ export class CommentResolvers {
         };
 
         db.comments.push(comment);
-        pubsub.publish(`COMMENT ${newComment.post}`, { comment });
+        pubsub.publish<CommentSubscriptionPayload>(
+            `COMMENT ${newComment.post}`,
+            { comment, mutation: SubscriptionMutationPayload.CREATED }
+        );
 
         return comment;
     }
