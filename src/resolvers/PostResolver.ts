@@ -3,6 +3,8 @@ import {
     Ctx,
     FieldResolver,
     Mutation,
+    PubSub,
+    PubSubEngine,
     Query,
     Resolver,
     Root
@@ -59,7 +61,8 @@ export class PostResolvers {
     @Mutation((_returns) => Post!)
     addPost(
         @Ctx() { db }: GraphQLContext,
-        @Arg("newPost") newPost: AddPostInput
+        @Arg("newPost") newPost: AddPostInput,
+        @PubSub() pubsub: PubSubEngine
     ): Post {
         const userExists = db.users.some((user) => user.id === newPost.author);
 
@@ -72,6 +75,7 @@ export class PostResolvers {
         };
 
         db.posts.push(post);
+        if (post.published) pubsub.publish("POST", { post });
 
         return post;
     }

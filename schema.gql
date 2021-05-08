@@ -67,6 +67,7 @@ type Query {
 
 type Subscription {
   comment(post: String!): Comment!
+  post: Post!
 }
 
 input UpdateCommentInput {
