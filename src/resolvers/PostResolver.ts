@@ -94,11 +94,12 @@ export class PostResolvers {
         const postIndex = db.posts.findIndex((post) => post.id === id);
 
         if (postIndex === -1) throw new Error("No such post!");
+        const post = db.posts[postIndex]!;
 
         db.comments = db.comments.filter((comment) => comment.post !== id);
-        if (db.posts[postIndex]!.published) {
+        if (post.published) {
             pubsub.publish("POST", {
-                data: db.posts[postIndex],
+                data: post,
                 mutation: SubscriptionMutationPayload.DELETED
             });
         }
