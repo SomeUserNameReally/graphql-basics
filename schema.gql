@@ -42,6 +42,7 @@ type Mutation {
   deleteComment(id: String!): Comment!
   deletePost(id: String!): Post!
   deleteUser(id: String!): User!
+  updateComment(updatedComment: UpdateCommentInput!): Comment!
   updatePost(updatedPost: UpdatePostInput!): Post!
   updateUser(userInfo: UpdateUserInput!): User!
 }
@@ -62,6 +63,15 @@ type Query {
   posts(query: String): [Post!]
   user(id: String!): User
   users(query: String): [User!]
+}
+
+type Subscription {
+  comment(post: String!): Comment!
+}
+
+input UpdateCommentInput {
+  id: ID!
+  text: String!
 }
 
 input UpdatePostInput {

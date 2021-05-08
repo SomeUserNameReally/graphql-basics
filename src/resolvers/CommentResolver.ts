@@ -3,6 +3,8 @@ import {
     Ctx,
     FieldResolver,
     Mutation,
+    PubSub,
+    PubSubEngine,
     Query,
     Resolver,
     Root
@@ -62,7 +64,8 @@ export class CommentResolvers {
     @Mutation((_returns) => Comment!)
     addComment(
         @Ctx() { db }: GraphQLContext,
-        @Arg("newComment") newComment: AddCommentInput
+        @Arg("newComment") newComment: AddCommentInput,
+        @PubSub() pubsub: PubSubEngine
     ): Comment {
         const userExists = db.users.some(
             (user) => user.id === newComment.author
@@ -82,6 +85,7 @@ export class CommentResolvers {
         };
 
         db.comments.push(comment);
+        pubsub.publish(`COMMENT ${newComment.post}`, { comment });
 
         return comment;
     }
