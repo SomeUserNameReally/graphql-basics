@@ -15,6 +15,7 @@ import { AddPostInput } from "../types/inputs/AddPostInput";
 import { UpdatePostInput } from "../types/inputs/UpdatePostInput";
 import Post from "../types/Post";
 import User from "../types/User";
+import { SubscriptionMutationPayload } from "../typings/enums/subscriptions";
 import { GraphQLContext } from "../typings/global";
 
 @Resolver((_of) => Post)
@@ -75,18 +76,30 @@ export class PostResolvers {
         };
 
         db.posts.push(post);
-        if (post.published) pubsub.publish("POST", { post });
+        if (post.published)
+            pubsub.publish("POST", {
+                data: post,
+                mutation: SubscriptionMutationPayload.CREATED
+            });
 
         return post;
     }
 
     @Mutation((_returns) => Post!)
-    deletePost(@Ctx() { db }: GraphQLContext, @Arg("id") id: string): Post {
+    deletePost(
+        @Ctx() { db }: GraphQLContext,
+        @Arg("id") id: string,
+        @PubSub() pubsub: PubSubEngine
+    ): Post {
         const postIndex = db.posts.findIndex((post) => post.id === id);
 
         if (postIndex === -1) throw new Error("No such post!");
 
         db.comments = db.comments.filter((comment) => comment.post !== id);
+        pubsub.publish("POST", {
+            data: db.posts[postIndex],
+            mutation: SubscriptionMutationPayload.DELETED
+        });
 
         return db.posts.splice(postIndex, 1)[0]!;
     }

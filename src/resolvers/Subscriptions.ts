@@ -1,6 +1,6 @@
 import { Subscription, Resolver, Root, Arg } from "type-graphql";
 import Comment from "../types/Comment";
-import Post from "../types/Post";
+import PostSubscriptionPayload from "../types/subscriptions/Post";
 
 @Resolver()
 export class Subscriptions {
@@ -17,10 +17,10 @@ export class Subscriptions {
         };
     }
 
-    @Subscription(() => Post!, {
+    @Subscription(() => PostSubscriptionPayload!, {
         topics: "POST"
     })
-    post(@Root("post") payload: { post: Post }) {
+    post(@Root() payload: PostSubscriptionPayload) {
         return {
             ...payload
         };
