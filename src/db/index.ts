@@ -25,15 +25,15 @@ const posts: Post[] = [
         body: "Post 1 body",
         published: true,
         author: "456",
-        comments: ["daad32sdfdsd"]
+        comments: ["4754"]
     },
     {
-        id: "1239d980fdn34kjldsf9034kl",
+        id: "1221",
         title: "Post 2",
         body: "Post 2 body",
         published: false,
         author: "456",
-        comments: ["wesffsd89324jhk"]
+        comments: ["1111"]
     },
     {
         id: "456",
@@ -41,30 +41,30 @@ const posts: Post[] = [
         body: "This is the body for my first post!",
         published: true,
         author: "123",
-        comments: ["sdf98032rjhi"]
+        comments: ["3527"]
     }
 ];
 
 const comments: Comment[] = [
     {
-        id: "daad32sdfdsd",
+        id: "4754",
         date: new Date(),
         text: "Comment 1",
         post: "123",
         author: "456"
     },
     {
-        id: "sdf98032rjhi",
+        id: "3527",
         date: new Date(),
         text: "Comment 2",
         post: "456",
         author: "456"
     },
     {
-        id: "wesffsd89324jhk",
+        id: "1111",
         date: new Date(),
         text: "Comment 3",
-        post: "1239d980fdn34kjldsf9034kl",
+        post: "1221",
         author: "123"
     }
 ];
