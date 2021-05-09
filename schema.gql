@@ -30,6 +30,11 @@ type Comment {
   text: String!
 }
 
+type CommentSubscriptionPayload {
+  comment: Comment!
+  mutation: String!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -71,7 +76,7 @@ type Query {
 }
 
 type Subscription {
-  comment(post: String!): Comment!
+  comment(post: String!): CommentSubscriptionPayload!
   post: PostSubscriptionPayload!
 }
 

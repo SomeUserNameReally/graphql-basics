@@ -1,27 +1,28 @@
 import { Subscription, Resolver, Root, Arg } from "type-graphql";
-import Comment from "../types/Comment";
 import CommentSubscriptionPayload from "../types/subscriptions/Comment";
 import PostSubscriptionPayload from "../types/subscriptions/Post";
 
 @Resolver()
 export class Subscriptions {
-    @Subscription(() => Comment!, {
+    @Subscription(() => CommentSubscriptionPayload!, {
         topics: ({ args }) => `COMMENT ${args.post}`
     })
     comment(
-        @Root("comment") payload: CommentSubscriptionPayload,
-        @Arg("post") post: string
-    ) {
+        @Root() payload: CommentSubscriptionPayload, // @Root decorator must not take any arguments for name of variable for an object type!
+        @Arg("post") _post: string // This variable is needed for the dynamic topic function in the decorator to work!
+    ): CommentSubscriptionPayload {
         return {
-            ...payload,
-            post
+            ...payload
         };
     }
 
     @Subscription(() => PostSubscriptionPayload!, {
         topics: "POST"
     })
-    post(@Root() payload: PostSubscriptionPayload) {
+    post(
+        @Root()
+        payload: PostSubscriptionPayload // @Root decorator must not take any arguments for name of variable for an object type!
+    ): PostSubscriptionPayload {
         return {
             ...payload
         };

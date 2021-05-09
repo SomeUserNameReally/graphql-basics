@@ -4,7 +4,6 @@ import {
     FieldResolver,
     Mutation,
     PubSub,
-    PubSubEngine,
     Query,
     Resolver,
     Root
@@ -99,13 +98,20 @@ export class CommentResolvers {
     @Mutation((_returns) => Comment!)
     deleteComment(
         @Ctx() { db }: GraphQLContext,
-        @Arg("id") id: string
+        @Arg("id") id: string,
+        @PubSub() pubsub: PubSubImplementation
     ): Comment {
         const commentIndex = db.comments.findIndex(
             (comment) => comment.id === id
         );
 
         if (commentIndex === -1) throw new Error("No such Comment!");
+        const comment = db.comments[commentIndex]!;
+
+        pubsub.publish<CommentSubscriptionPayload>(`COMMENT ${comment.post}`, {
+            mutation: SubscriptionMutationPayload.DELETED,
+            comment
+        });
 
         return db.comments.splice(commentIndex, 1)[0]!;
     }

@@ -4,7 +4,6 @@ import {
     FieldResolver,
     Mutation,
     PubSub,
-    PubSubEngine,
     Query,
     Resolver,
     Root
