@@ -110,7 +110,7 @@ export class CommentResolvers {
         const comment = db.comments[commentIndex]!;
 
         pubsub.publish<string, CommentSubscriptionPayload>(
-            `COMMENT ${comment.post}`,
+            COMMENT_CHANNEL_GENERATOR(comment.post),
             {
                 mutation: SubscriptionMutationPayload.DELETED,
                 comment
