@@ -1,3 +1,4 @@
+import { IsDate, Length } from "class-validator";
 import { Field, ID, ObjectType } from "type-graphql";
 import Post from "./Post";
 import User from "./User";
@@ -8,9 +9,11 @@ export default class Comment {
     id!: string;
 
     @Field()
+    @IsDate()
     date!: Date;
 
     @Field()
+    @Length(0, 255)
     text!: string;
 
     @Field(() => Post!)
