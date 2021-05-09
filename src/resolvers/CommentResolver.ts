@@ -9,7 +9,7 @@ import {
     Root
 } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
-import { COMMENT_CHANNEL_GENERATOR } from "../helpers/subscriptions/channelGenerators";
+import { commentChannelGenerator } from "../helpers/subscriptions/channelGenerators";
 import PubSubImplementation from "../PubSub";
 import Comment from "../types/Comment";
 import { AddCommentInput } from "../types/inputs/AddCommentInput";
@@ -89,7 +89,7 @@ export class CommentResolvers {
 
         db.comments.push(comment);
         pubsub.publish<string, CommentSubscriptionPayload>(
-            COMMENT_CHANNEL_GENERATOR(newComment.post),
+            commentChannelGenerator(newComment.post),
             { comment, mutation: SubscriptionMutationPayload.CREATED }
         );
 
@@ -110,7 +110,7 @@ export class CommentResolvers {
         const comment = db.comments[commentIndex]!;
 
         pubsub.publish<string, CommentSubscriptionPayload>(
-            COMMENT_CHANNEL_GENERATOR(comment.post),
+            commentChannelGenerator(comment.post),
             {
                 mutation: SubscriptionMutationPayload.DELETED,
                 comment
@@ -123,7 +123,8 @@ export class CommentResolvers {
     @Mutation((_returns) => Comment!)
     updateComment(
         @Ctx() { db }: GraphQLContext,
-        @Arg("updatedComment") updatedComment: UpdateCommentInput
+        @Arg("updatedComment") updatedComment: UpdateCommentInput,
+        @PubSub() pubsub: PubSubImplementation
     ): Comment {
         const commentIndex = db.comments.findIndex(
             (comment) => comment.id === updatedComment.id
@@ -138,6 +139,14 @@ export class CommentResolvers {
 
         newComment.date = new Date();
         newComment.text = updatedComment.text;
+
+        pubsub.publish<string, CommentSubscriptionPayload>(
+            commentChannelGenerator(newComment.post),
+            {
+                mutation: SubscriptionMutationPayload.UPDATED,
+                comment: newComment
+            }
+        );
 
         return newComment;
     }

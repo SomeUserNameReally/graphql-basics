@@ -1,1 +1,1 @@
-export const COMMENT_CHANNEL_GENERATOR = (id: string) => `COMMENT ${id}`;
+export const commentChannelGenerator = (postID: string) => `COMMENT ${postID}`;
