@@ -9,6 +9,7 @@ import {
     Root
 } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
+import { COMMENT_CHANNEL_GENERATOR } from "../helpers/subscriptions/channelGenerators";
 import PubSubImplementation from "../PubSub";
 import Comment from "../types/Comment";
 import { AddCommentInput } from "../types/inputs/AddCommentInput";
@@ -87,8 +88,8 @@ export class CommentResolvers {
         };
 
         db.comments.push(comment);
-        pubsub.publish<CommentSubscriptionPayload>(
-            `COMMENT ${newComment.post}`,
+        pubsub.publish<string, CommentSubscriptionPayload>(
+            COMMENT_CHANNEL_GENERATOR(newComment.post),
             { comment, mutation: SubscriptionMutationPayload.CREATED }
         );
 
@@ -108,10 +109,13 @@ export class CommentResolvers {
         if (commentIndex === -1) throw new Error("No such Comment!");
         const comment = db.comments[commentIndex]!;
 
-        pubsub.publish<CommentSubscriptionPayload>(`COMMENT ${comment.post}`, {
-            mutation: SubscriptionMutationPayload.DELETED,
-            comment
-        });
+        pubsub.publish<string, CommentSubscriptionPayload>(
+            `COMMENT ${comment.post}`,
+            {
+                mutation: SubscriptionMutationPayload.DELETED,
+                comment
+            }
+        );
 
         return db.comments.splice(commentIndex, 1)[0]!;
     }

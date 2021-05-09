@@ -4,7 +4,10 @@ import { PubSubEngine } from "type-graphql";
 export default class PubSubImplementation extends PubSubEngine {
     static readonly PUBSUB = new PubSub();
 
-    publish<T extends Object>(triggerName: string, payload: T): Promise<void> {
+    publish<U extends string, T extends Object>(
+        triggerName: U,
+        payload: T
+    ): Promise<void> {
         return PubSubImplementation.PUBSUB.publish(triggerName, payload);
     }
 

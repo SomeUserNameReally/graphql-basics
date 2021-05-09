@@ -16,7 +16,10 @@ import { UpdatePostInput } from "../types/inputs/UpdatePostInput";
 import Post from "../types/Post";
 import PostSubscriptionPayload from "../types/subscriptions/Post";
 import User from "../types/User";
-import { SubscriptionMutationPayload } from "../typings/enums/subscriptions";
+import {
+    StaticSubscriptionChannelNames,
+    SubscriptionMutationPayload
+} from "../typings/enums/subscriptions";
 import { GraphQLContext } from "../typings/global";
 
 @Resolver((_of) => Post)
@@ -78,7 +81,10 @@ export class PostResolvers {
 
         db.posts.push(post);
         if (post.published)
-            pubsub.publish<PostSubscriptionPayload>("POST", {
+            pubsub.publish<
+                StaticSubscriptionChannelNames.POST,
+                PostSubscriptionPayload
+            >(StaticSubscriptionChannelNames.POST, {
                 data: post,
                 mutation: SubscriptionMutationPayload.CREATED
             });
@@ -99,7 +105,10 @@ export class PostResolvers {
 
         db.comments = db.comments.filter((comment) => comment.post !== id);
         if (post.published) {
-            pubsub.publish<PostSubscriptionPayload>("POST", {
+            pubsub.publish<
+                StaticSubscriptionChannelNames.POST,
+                PostSubscriptionPayload
+            >(StaticSubscriptionChannelNames.POST, {
                 data: post,
                 mutation: SubscriptionMutationPayload.DELETED
             });
@@ -134,7 +143,10 @@ export class PostResolvers {
 
             if (originalPost.published && !newPost.published) {
                 // Deleted
-                pubsub.publish<PostSubscriptionPayload>("POST", {
+                pubsub.publish<
+                    StaticSubscriptionChannelNames.POST,
+                    PostSubscriptionPayload
+                >(StaticSubscriptionChannelNames.POST, {
                     mutation: SubscriptionMutationPayload.DELETED,
                     data: originalPost
                 });
