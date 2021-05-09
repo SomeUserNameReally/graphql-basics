@@ -152,8 +152,22 @@ export class PostResolvers {
                 });
             } else if (!originalPost.published && newPost.published) {
                 // Created
+                pubsub.publish<
+                    StaticSubscriptionChannelNames.POST,
+                    PostSubscriptionPayload
+                >(StaticSubscriptionChannelNames.POST, {
+                    mutation: SubscriptionMutationPayload.CREATED,
+                    data: newPost
+                });
             } else if (newPost.published) {
                 // Updated
+                pubsub.publish<
+                    StaticSubscriptionChannelNames.POST,
+                    PostSubscriptionPayload
+                >(StaticSubscriptionChannelNames.POST, {
+                    mutation: SubscriptionMutationPayload.UPDATED,
+                    data: newPost
+                });
             }
         }
 
