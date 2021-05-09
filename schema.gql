@@ -63,7 +63,7 @@ type Post {
 
 type PostSubscriptionPayload {
   data: Post!
-  mutation: String!
+  mutation: SubscriptionMutationPayload!
 }
 
 type Query {
@@ -78,6 +78,13 @@ type Query {
 type Subscription {
   comment(post: String!): CommentSubscriptionPayload!
   post: PostSubscriptionPayload!
+}
+
+"""Possible subscription mutation states."""
+enum SubscriptionMutationPayload {
+  CREATED
+  DELETED
+  UPDATED
 }
 
 input UpdateCommentInput {

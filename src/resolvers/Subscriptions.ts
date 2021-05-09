@@ -7,7 +7,7 @@ import { StaticSubscriptionChannelNames } from "../typings/enums/subscriptions";
 @Resolver()
 export class Subscriptions {
     @Subscription(() => CommentSubscriptionPayload!, {
-        topics: ({ args }) => commentChannelGenerator(args.post)
+        topics: ({ args }) => commentChannelGenerator(args.post) // Property on `args` object must match the name declared in the corresponding `@Arg` decorator.
     })
     comment(
         @Root() payload: CommentSubscriptionPayload, // @Root decorator must not take any arguments for name of variable for an object type!

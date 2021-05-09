@@ -6,7 +6,7 @@ import BaseSubscriptionPayload from "./Base";
 @ObjectType()
 export default class PostSubscriptionPayload
     implements BaseSubscriptionPayload {
-    @Field()
+    @Field(() => SubscriptionMutationPayload)
     mutation!: SubscriptionMutationPayload;
 
     @Field(() => Post!)
