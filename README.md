@@ -1,4 +1,4 @@
-This is a basic do over in TypeScript with TypeGraphQL, Prisma v2, and Apollo Server of part one of the GraphQL course taught by Andrew Mead on Udemy.
+This is a basic do over in TypeScript with TypeGraphQL and Apollo Server of part one of the GraphQL course taught by Andrew Mead on Udemy.
 
 This is not a production ready application. There are a number of refinements to be made such as security, rate limiting, query caching, error handling, crash recovery, logging, metrics, etc.
 
